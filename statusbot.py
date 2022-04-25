@@ -8,7 +8,6 @@ from random import randint
 
 
 
-#client = discord.Client()
 intents = discord.Intents().all()
 intents.members = True
 intents.presences = True
@@ -21,7 +20,7 @@ async def hello(ctx):
 
 
 @bot.event
-async def on_member_update(before, after):
+async def on_presence_update(before, after):
     print('event fired: '+before.name)
     statusText = 'NULL'
     filename = str(after.id) + '.txt'
@@ -99,6 +98,32 @@ async def checkforduplicate(filename, string):
     return answerkey
 
 
+@bot.command()  ## opt-in to have your status messages recorded
+async def record(ctx):
+
+    goahead = 0 #tracker variable
+
+    with open('userlist.txt', 'r', encoding='utf-8') as q:
+        if (str(ctx.author.id) in q.read()):
+            await ctx.message.reply("You've already opted-in!")
+        else:
+            goahead = 1
+
+    if(goahead == 1):
+        try:
+            with open('userlist.txt', 'a', encoding='utf-8') as f:
+                f.write(str(ctx.author.id)+'\n')
+                f.close()
+                await ctx.message.add_reaction("🤖")
+                await ctx.message.add_reaction("👍")
+        except:
+            print('unable to add '+ctx.author.display_name+' to userlist\n')
+            await ctx.message.add_reaction("🤖")
+            await ctx.message.add_reaction("❌")
+
+
+
+
 @bot.event  ##CAREFUL WITH THIS ONE
 async def on_message(message):
     await bot.process_commands(message)
@@ -106,7 +131,8 @@ async def on_message(message):
 
 
 async def react(message):
-    if message.content == "Meeting":
+    if message.content == "swag":
+        #await message.add_reaction("🤖")
         await message.add_reaction("👍")
 
 
