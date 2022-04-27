@@ -23,23 +23,26 @@ async def hello(ctx):
 async def on_presence_update(before, after):
     print('event fired: '+before.name)
     statusText = 'NULL'
-    filename = str(after.id) + '.txt'
-    with open(filename, 'a', encoding='utf-8') as f:
-        for s in after.activities:
-            if isinstance(s, discord.CustomActivity):
-                #await after.channel.send(s)
-                statusText = str(s.state)
-        timestamp = datetime.datetime.now().date()
-        if statusText != 'NULL':
-            if await checkforduplicate(
-                    filename,
-                    statusText) <= 0:
-                f.write(statusText + ' \u0001🏆\u0001 ' + str(timestamp) + '\n')
-            #await after.channel.send(timestamp)
-        #else:
-        #await after.channel.send('no status')
-    f.close()
-
+    with open('userlist.txt') as z:
+        if str(before.id) in z.read():
+            filename = str(after.id) + '.txt'
+            with open(filename, 'a', encoding='utf-8') as f:
+                for s in after.activities:
+                    if isinstance(s, discord.CustomActivity):
+                        #await after.channel.send(s)
+                        statusText = str(s.state)
+                timestamp = datetime.datetime.now().date()
+                if statusText != 'NULL':
+                    if await checkforduplicate(
+                            filename,
+                            statusText) <= 0:
+                        f.write(statusText + ' \u0001🏆\u0001 ' + str(timestamp) + '\n')
+                    #await after.channel.send(timestamp)
+                #else:
+                #await after.channel.send('no status')
+            f.close()
+        else:
+            print('UID not found in userlist.txt')
 
 @bot.command()  ## display entire list
 async def list(ctx):
