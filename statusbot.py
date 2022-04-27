@@ -155,4 +155,4 @@ async def react(message):
 
 #await message.channel.send('Hello!')
 
-bot.run('OTY3ODg4MzE3MDEyMTMxOTIw.YmW2PQ.lxyk3HFOLFL_T_DxdLRKG8dsTxA')
+bot.run('PASTE TOKEN HERE')
