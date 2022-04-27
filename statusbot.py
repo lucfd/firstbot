@@ -5,8 +5,12 @@ import datetime
 from random import seed
 from random import randint
 
-
-
+#code to hide my token
+from dotenv import load_dotenv
+import os
+load_dotenv()
+TOKEN = os.getenv("TOKEN")
+#end of .env code
 
 intents = discord.Intents().all()
 intents.members = True
@@ -33,9 +37,7 @@ async def on_presence_update(before, after):
                         statusText = str(s.state)
                 timestamp = datetime.datetime.now().date()
                 if statusText != 'NULL':
-                    if await checkforduplicate(
-                            filename,
-                            statusText) <= 0:
+                    if await checkforduplicate(filename, statusText) <= 0:
                         f.write(statusText + ' \u0001🏆\u0001 ' + str(timestamp) + '\n')
                     #await after.channel.send(timestamp)
                 #else:
@@ -155,4 +157,4 @@ async def react(message):
 
 #await message.channel.send('Hello!')
 
-bot.run('PASTE TOKEN HERE')
+bot.run(TOKEN)
