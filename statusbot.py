@@ -28,14 +28,20 @@ async def hello(ctx):
 async def on_presence_update(before, after):
     print('event fired: '+before.name)
     statusText = 'NULL'
-    with open('userlist.txt') as z:
+
+    with open('userlist.txt') as z: #checking to see if this user has opted-in
         if str(before.id) in z.read():
             filename = str(after.id) + '.txt'
-            with open(filename, 'a', encoding='utf-8') as f:
+            with open(filename, 'a', encoding='utf-8') as f: #recording the status message
                 for s in after.activities:
                     if isinstance(s, discord.CustomActivity):
                         #await after.channel.send(s)
-                        statusText = str(s.state)
+                        statusText = str(s.name)
+
+                        if s.emoji is not None: #check if emoji is present
+                            if s.emoji.is_unicode_emoji() == True: #check if unicode emoji
+                                statusText = str(s.emoji) + ' ' + statusText #append emoji if it's unicode valid
+
                 timestamp = datetime.datetime.now().date()
                 if statusText != 'NULL':
                     if await checkforduplicate(filename, statusText) <= 0:
@@ -138,9 +144,18 @@ async def on_message(message):
 
 
 async def react(message):
-    if message.content == "swag":
+    if message.content == "test":
+        if message.author.activities[0].emoji is not None:
+            if message.author.activities[0].emoji.is_unicode_emoji() == True:
+                await message.reply('your status is: '+ str(message.author.activities[0].emoji))
+            else:
+                await message.reply('your emoji is not available')
+        else:
+            await message.reply("You have no emoji!")
         #await message.add_reaction("🤖")
-        await message.add_reaction("👍")
+        #await message.add_reaction("👍")
+
+
 
 
 bot.run(TOKEN)
