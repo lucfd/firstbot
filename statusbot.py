@@ -15,12 +15,13 @@ TOKEN = os.getenv("TOKEN")
 intents = discord.Intents().all()
 intents.members = True
 intents.presences = True
+intents.messages = True
 bot = commands.Bot(command_prefix='$', intents=intents)
 
 
 @bot.command()
 async def hello(ctx):
-    await ctx.channel.send('hai')
+    await ctx.channel.send('hello!')
 
 
 @bot.event
@@ -55,7 +56,7 @@ async def list(ctx):
         with open(filename, 'r', encoding='utf-8') as f:
             lines = f.readlines()
             for line in lines:
-                x = line.split(' 🏆 ')
+                x = line.split(' 🏆 ') #funky text delimiter because processing user input
                 biglist = biglist + (x[0].strip() + ' (' + x[1].strip() + ')\n')
                 #await ctx.channel.send(x[0].strip()+' ('+x[1].strip()+')')
             await ctx.channel.send(biglist)
@@ -66,11 +67,11 @@ async def list(ctx):
 
 @bot.command()  ## display a random status from your list
 async def rand(ctx):
-    seed(None)
-    filename = str(ctx.author.id) + '.txt'
+    seed(None) #generate seed based off of our clock
+    filename = str(ctx.author.id) + '.txt' #get filename from user's UID
 
     try:
-        with open(filename, 'r', encoding='utf-8') as f:
+        with open(filename, 'r', encoding='utf-8') as f: #open user's respective file
             lines = f.readlines()
             target = randint(0, len(lines) - 1)
             print(len(lines))
@@ -123,6 +124,7 @@ async def record(ctx):
                 await ctx.message.add_reaction("👍")
         except:
             print('unable to add '+ctx.author.display_name+' to userlist\n')
+            ctx.message.reply('Something went wrong, please contact the bot\'s creator!')
             await ctx.message.add_reaction("🤖")
             await ctx.message.add_reaction("❌")
 
@@ -140,21 +142,5 @@ async def react(message):
         #await message.add_reaction("🤖")
         await message.add_reaction("👍")
 
-
-
-
-
-
-#@client.event
-#async def on_message(message):
-#    if message.author == client.user:
-#        return
-#
-#    if message.content.startswith('$hello'):
-#        id = message.author.id
-#        await message.channel.send("Your status is: " + str(discord.CustomActivity))
-#        await message.channel.send(':robot:')
-
-#await message.channel.send('Hello!')
 
 bot.run(TOKEN)
