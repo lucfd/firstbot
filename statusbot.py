@@ -32,16 +32,15 @@ async def on_presence_update(before, after):
     with open('userlist.txt') as z: #checking to see if this user has opted-in
         if str(before.id) in z.read():
             filename = str(after.id) + '.txt'
-            with open(filename, 'a', encoding='utf-8') as f: #recording the status message
+            with open(filename, 'a', encoding='utf-8') as f: # recording the status message
                 for s in after.activities:
-                    if isinstance(s, discord.CustomActivity):
-                        statusText = str(s.name)
+                    if isinstance(s, discord.CustomActivity): # iterate through activities, look for CustomActivity
+                        statusText = str(s.name)              # copy down status text
                         #await after.channel.send(s)
 
-                        if statusText != 'None':
-                        #if not empty status, check for emoji
-                            if s.emoji is not None: #check if emoji is present
-                                if s.emoji.is_unicode_emoji() == True: #check if unicode emoji
+                        if statusText != 'None': #if status isn't empty, check for emoji attribute
+                            if s.emoji is not None:
+                                if s.emoji.is_unicode_emoji() == True:
                                     statusText = str(s.emoji) + ' ' + statusText #append emoji if it's unicode valid
                         else: #if status is empty, set it to None
                             statusText = None
