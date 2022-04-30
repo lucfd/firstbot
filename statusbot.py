@@ -27,7 +27,7 @@ async def hello(ctx):
 @bot.event
 async def on_presence_update(before, after):
     print('event fired: '+before.name)
-    statusText = 'NULL'
+    statusText = None
 
     with open('userlist.txt') as z: #checking to see if this user has opted-in
         if str(before.id) in z.read():
@@ -35,15 +35,19 @@ async def on_presence_update(before, after):
             with open(filename, 'a', encoding='utf-8') as f: #recording the status message
                 for s in after.activities:
                     if isinstance(s, discord.CustomActivity):
-                        #await after.channel.send(s)
                         statusText = str(s.name)
+                        #await after.channel.send(s)
 
-                        if s.emoji is not None: #check if emoji is present
-                            if s.emoji.is_unicode_emoji() == True: #check if unicode emoji
-                                statusText = str(s.emoji) + ' ' + statusText #append emoji if it's unicode valid
+                        if statusText != 'None':
+                        #if not empty status, check for emoji
+                            if s.emoji is not None: #check if emoji is present
+                                if s.emoji.is_unicode_emoji() == True: #check if unicode emoji
+                                    statusText = str(s.emoji) + ' ' + statusText #append emoji if it's unicode valid
+                        else: #if status is empty, set it to None
+                            statusText = None
 
                 timestamp = datetime.datetime.now().date()
-                if statusText != 'NULL':
+                if statusText != None:
                     if await checkforduplicate(filename, statusText) <= 0:
                         f.write(statusText + ' \u0001🏆\u0001 ' + str(timestamp) + '\n')
                     #await after.channel.send(timestamp)
@@ -154,8 +158,10 @@ async def react(message):
             await message.reply("You have no emoji!")
         #await message.add_reaction("🤖")
         #await message.add_reaction("👍")
-
-
+    elif message.content == "statuscheck":
+        await message.reply('your status is: ' + str(message.author.activities[0].name))
+        if message.author.activities[0].name == None:
+            await message.reply("Empty status")
 
 
 bot.run(TOKEN)
