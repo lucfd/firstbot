@@ -4,7 +4,7 @@ from discord.ext import commands
 import datetime
 from random import seed
 from random import randint
-
+import helpers
 
 class aclient(discord.Client):
 
@@ -28,32 +28,7 @@ tree = app_commands.CommandTree(client)
 async def on_presence_update(before, after):
     print('event fired: ' + before.name)
     statusText = None
-    with open('userlist.txt') as z:  # checking to see if this user has opted-in
-        if str(before.id) in z.read():
-            filename = str(after.id) + '.txt'
-            with open(filename, 'a', encoding='utf-8') as f:  # recording the status message
-                for s in after.activities:
-                    if isinstance(s, discord.CustomActivity):  # iterate through activities, look for CustomActivity
-                        statusText = str(s.name)  # copy down status text
-                        # await after.channel.send(s)
-
-                        if statusText != 'None':  # if status isn't empty, check for emoji attribute
-                            if s.emoji is not None:
-                                if s.emoji.is_unicode_emoji() == True:
-                                    statusText = str(s.emoji) + ' ' + statusText  # append emoji if it's unicode valid
-                        else:  # if status is empty, set it to None
-                            statusText = None
-
-                timestamp = datetime.datetime.now().date()
-                if statusText != None:
-                    if await checkforduplicate(filename, statusText) <= 0:
-                        f.write(statusText + ' \u0001🏆\u0001 ' + str(timestamp) + '\n')
-                    # await after.channel.send(timestamp)
-                # else:
-                # await after.channel.send('no status')
-            f.close()
-        else:
-            print('UID not found in userlist.txt')
+    helpers.save_status(before, after)
 
 
 @tree.command(name='random', description='Posts a random status from your list')
