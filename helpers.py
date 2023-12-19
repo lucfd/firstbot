@@ -18,6 +18,58 @@ def read_list(filename):
         print(f"Error decoding JSON in file '{filename}': {e}")
         return None
 
+def fetch_status_text(presence):
+
+    for field in presence.activities:
+        if isinstance(field, discord.CustomActivity):  # iterate through activities, look for CustomActivity
+            statusText = str(field.name)  # copy down status text   
+            return statusText
+
+    return None # if nothing is found
+
+
+def fetch_emoji(presence):
+    
+    for field in presence.activities:
+        if isinstance(field, discord.CustomActivity):
+
+            if field.emoji is not None: # not all status messages have an emoji
+                if field.emoji.is_unicode_emoji() == True:
+                    emoji = str(field.emoji)
+                    return emoji
+    
+    return None
+
+
+def emoji_exists(presence):
+    
+    for field in presence.activities:
+        if isinstance(field, discord.CustomActivity):
+
+            if field.emoji is not None:
+                if field.emoji.is_unicode_emoji() == True:
+                    return True
+    
+    return False
+
+
+def read_status(presence):
+    
+    statusText = fetch_status_text(presence)
+
+    if statusText == None:
+        return None
+
+    # emoji handler block
+    if emoji_exists(presence):
+        emoji = fetch_emoji(presence)
+        statusText = emoji + ' ' + statusText
+
+    timestamp = datetime.datetime.now().date()
+    statusText = statusText + ' ' + str(timestamp)
+    return statusText
+
+        
 
 def save_status(before, after):
     
