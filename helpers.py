@@ -69,7 +69,18 @@ def read_status(presence):
     statusText = statusText + ' ' + str(timestamp)
     return statusText
 
+
+def is_duplicate(status, filename):
+
+    status_list = read_list(filename)
+
+    for entry in status_list:
+
+        if(entry["message"] == status):
+            return True
         
+    return False
+
 
 def save_status(before, after):
     
