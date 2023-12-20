@@ -70,7 +70,7 @@ def read_status(presence):
     return statusText
 
 
-def is_duplicate(status, filename):
+def is_duplicate(status, filename): # returns True if a status message already exists in a user's list (ignores timestamp)
 
     status_list = read_list(filename)
 
@@ -82,37 +82,44 @@ def is_duplicate(status, filename):
     return False
 
 
+def is_opted_in(presence):  # checking to see if this user has opted-in
+
+    try:
+        with open('userlist.txt') as file:
+            if str(presence.id) in file.read():
+                return True
+            else:
+                return False
+    except:
+        return False
+
+
 def save_status(before, after):
     
-    filename = 'test.json'
+    filename = str(after.id) + '.json'
 
 
-    with open(filename, 'a', encoding='utf-8') as f:  # recording the status message
-        for s in after.activities:
-            if isinstance(s, discord.CustomActivity):  # iterate through activities, look for CustomActivity
-                statusText = str(s.name)  # copy down status text
-                # await after.channel.send(s)
+    try:
+        with open(filename, 'r') as json_file:
+            json_data = json.load(json_file)
+    except FileNotFoundError:
+        print('file not found')
+        json_data = []
+    except json.JSONDecodeError:
+        print("Error: The file contains invalid JSON or is empty.")
+        json_data = []
 
-                if statusText != 'None':  # if status isn't empty, check for emoji attribute
-                    if s.emoji is not None:
-                        if s.emoji.is_unicode_emoji() == True:
-                            statusText = str(s.emoji) + ' ' + statusText  # append emoji if it's unicode valid
-                else:  # if status is empty, set it to None
-                    statusText = None
 
-        timestamp = datetime.datetime.now().date()
-        if statusText != None:
+        status_text = read_status(after)
 
-            data = {
-                'message': statusText,
-                'timestamp': timestamp
+        if status_text != None:
+
+            new_status = {
+                'message': status_text,
+                'timestamp': datetime.datetime.now().date()
                     }
 
-
-            json.dump(data, f, indent=2, default=str, separators=(',', ':'))
-
-
-            # await after.channel.send(timestamp)
-        # else:
-        # await after.channel.send('no status')
-    f.close()
+        json_data.append(new_status)
+    
+    with open(filename, 'w') as json_file:
+        json.dump(json_data, json_file, indent=2, default=str)
